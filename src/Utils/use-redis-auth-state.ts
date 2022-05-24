@@ -11,7 +11,7 @@ import { BufferJSON } from './generics'
  * Again, I wouldn't endorse this for any production level use other than perhaps a bot.
  * Would recommend writing an auth state for use with a proper SQL or No-SQL DB
  * */
-export const useMultiFileAuthState = async(fileName: string,redis : any): Promise<{ state: AuthenticationState, saveCreds: () => Promise<void>}> => {
+export const useRedisAuthState = async(fileName: string,redis : any): Promise<{ state: AuthenticationState, saveCreds: () => Promise<void>}> => {
 
 	const writeData = (data: any, file: string) => {
 			return redis.set(fileName +'_'+file,JSON.stringify(data, BufferJSON.replacer))
