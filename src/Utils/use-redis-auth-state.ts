@@ -17,14 +17,14 @@ export const useRedisAuthState = async(fileName: string,redis : any): Promise<{ 
 			return redis.set(fileName +'_'+file,JSON.stringify(data, BufferJSON.replacer))
 	}
 
-	const readKeys = async(key:string){
+	const readKeys = async(key:string)=>{
 			let cek = await readData('keys')
 			if(cek){
 				return cek[key]
 			}
 	}
 
-	const writeKeys = async(data : any,key:string){
+	const writeKeys = async(data : any,key:string)=>{
 				let cek = await readData('keys') || {}
 				if(data){
 					cek[key] = data
