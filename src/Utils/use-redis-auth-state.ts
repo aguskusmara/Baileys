@@ -17,10 +17,27 @@ export const useRedisAuthState = async(fileName: string,redis : any): Promise<{ 
 			return redis.set(fileName +'_'+file,JSON.stringify(data, BufferJSON.replacer))
 	}
 
-	const readData = async(file: string) => {
+	const readKeys = async(key:string){
+			let cek = await readData('keys')
+			if(cek){
+				return cek[key]
+			}
+	}
+
+	const writeKeys = async(data : any,key:string){
+				let cek = await readData('keys') || {}
+				if(data){
+					cek[key] = data
+				}else{
+					delete cek[key]
+				}
+				return writeData(cek,'keys')
+	}
+	
+	const readData = async(file: string,key : boolean = true) => {
 		try {
-			const data = await redis.get(fileName +'_'+file)
-			return JSON.parse(data, BufferJSON.reviver)
+				const data = await redis.get(fileName +'_'+file)
+				return JSON.parse(data, BufferJSON.reviver)
 		} catch(error) {
 			return null
 		}
@@ -37,9 +54,9 @@ export const useRedisAuthState = async(fileName: string,redis : any): Promise<{ 
 					await Promise.all(
 						ids.map(
 							async id => {
-								let value = await readData(`${type}-${id}`)
+								let value = await readKeys(`${type}-${id}`)
 								if(type === 'app-state-sync-key') {
-									value = proto.AppStateSyncKeyData.fromObject(data)
+									value = proto.AppStateSyncKeyData.fromObject(value)
 								}
 
 								data[id] = value
@@ -53,7 +70,9 @@ export const useRedisAuthState = async(fileName: string,redis : any): Promise<{ 
 					const tasks: Promise<void>[] = []
 					for(const category in data) {
 						for(const id in data[category]) {
-							tasks.push(writeData(data[category][id], `${category}-${id}`))
+							const value = data[category][id]
+							const file = `${category}-${id}`
+							tasks.push(writeKeys(value, file))
 						}
 					}
 
