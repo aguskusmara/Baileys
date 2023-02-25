@@ -562,7 +562,7 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 						)
 						retryMutex.mutex(
 							async() => {
-								if(ws.readyState === ws.OPEN) {
+								if(ws.isOpen) {
 									const encNode = getBinaryNodeChild(node, 'enc')
 									await sendRetryRequest(node, !encNode)
 									if(retryRequestDelayMs) {
